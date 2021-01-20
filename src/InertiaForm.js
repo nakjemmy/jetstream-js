@@ -9,6 +9,8 @@ import {
     reservedFieldNames
 } from './util';
 
+let transform = data => data;
+
 class InertiaForm {
     constructor(data = {}, options = {}) {
         this.processing = false;
@@ -35,6 +37,13 @@ class InertiaForm {
     static create(data = {}) {
         return new InertiaForm().withData(data);
     }
+
+    transform(callback) {
+        transform = callback;
+
+        return this;
+    }
+
 
     withData(data) {
         if (isArray(data)) {
@@ -106,8 +115,22 @@ class InertiaForm {
         return data;
     }
 
-    reset() {
-        merge(this, this.initial);
+    reset(...fields) {
+        if (fields.length === 0) {
+            merge(this, this.initial);
+        }
+        else {
+            merge(
+                this,
+                Object
+                    .keys(this.initial)
+                    .filter(key => fields.includes(key))
+                    .reduce((carry, key) => {
+                        carry[key] = this.initial[key]
+                        return carry
+                    }, {}),
+            )
+        }
 
         this.isDirty = false;
     }
@@ -143,7 +166,7 @@ class InertiaForm {
         const onSuccess = page => {
             this.processing = false;
 
-            if (! this.hasErrors()) {
+            if (!this.hasErrors()) {
                 this.onSuccess();
             } else {
                 this.onFail();
@@ -155,10 +178,12 @@ class InertiaForm {
         }
 
         if (requestType === 'delete') {
-            return this.__inertia[requestType](url, { ... options, onSuccess })
+            return this.__inertia[requestType](url, { ...options, onSuccess })
         }
 
-        return this.__inertia[requestType](url, this.hasFiles() ? objectToFormData(this.data()) : this.data(), { ... options, onSuccess })
+        const data = transform(this.data());
+
+        return this.__inertia[requestType](url, this.hasFiles() ? objectToFormData(data) : data, { ...options, onSuccess })
     }
 
     hasFiles() {
@@ -219,13 +244,13 @@ class InertiaForm {
 
     hasErrors() {
         return this.inertiaPage().errorBags[this.__options.bag] &&
-               Object.keys(this.inertiaPage().errorBags[this.__options.bag]).length > 0;
+            Object.keys(this.inertiaPage().errorBags[this.__options.bag]).length > 0;
     }
 
     hasError(field) {
         return this.hasErrors() &&
-               this.inertiaPage().errorBags[this.__options.bag][field] &&
-               this.inertiaPage().errorBags[this.__options.bag][field].length > 0;
+            this.inertiaPage().errorBags[this.__options.bag][field] &&
+            this.inertiaPage().errorBags[this.__options.bag][field].length > 0;
     }
 
     error(field) {
@@ -237,14 +262,14 @@ class InertiaForm {
     errors(field = null) {
         if (field === null) {
             return this.hasErrors()
-                        ? Object.values(this.inertiaPage().errorBags[this.__options.bag])
-                                .reduce((a, b) => a.concat(b), [])
-                        : [];
+                ? Object.values(this.inertiaPage().errorBags[this.__options.bag])
+                    .reduce((a, b) => a.concat(b), [])
+                : [];
         }
 
         return this.hasError(field)
-                    ? this.inertiaPage().errorBags[this.__options.bag][field]
-                    : [];
+            ? this.inertiaPage().errorBags[this.__options.bag][field]
+            : [];
     }
 
     inertiaPage() {
@@ -257,7 +282,7 @@ class InertiaForm {
         if (requestTypes.indexOf(requestType) === -1) {
             throw new Error(
                 `\`${requestType}\` is not a valid request type, ` +
-                    `must be one of: \`${requestTypes.join('`, `')}\`.`
+                `must be one of: \`${requestTypes.join('`, `')}\`.`
             );
         }
     }
@@ -266,7 +291,7 @@ class InertiaForm {
 export function useForm(data, options) {
     const adapter = require('@inertiajs/inertia-vue3')
 
-    if (! adapter || ! shallowReactive) throw Error('The useForm hook may only be used with Vue 3 and @inertiajs/inertia-vue3.')
+    if (!adapter || !shallowReactive) throw Error('The useForm hook may only be used with Vue 3 and @inertiajs/inertia-vue3.')
 
     return shallowReactive(
         InertiaForm.create()
