@@ -164,8 +164,6 @@ class InertiaForm {
         this.successful = false;
 
         const onSuccess = page => {
-            this.processing = false;
-
             if (!this.hasErrors()) {
                 this.onSuccess();
             } else {
@@ -177,13 +175,22 @@ class InertiaForm {
             }
         }
 
+        const onFinish = () => {
+            this.processing = false
+
+            if (options.onFinish) {
+                return options.onFinish()
+            }
+        },
+
+
         if (requestType === 'delete') {
             return this.__inertia[requestType](url, { ...options, onSuccess })
         }
 
         const data = transform(this.data());
 
-        return this.__inertia[requestType](url, this.hasFiles() ? objectToFormData(data) : data, { ...options, onSuccess })
+        return this.__inertia[requestType](url, this.hasFiles() ? objectToFormData(data) : data, { ...options, onSuccess, onFinish })
     }
 
     hasFiles() {

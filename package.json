@@ -1,6 +1,6 @@
 {
-    "name": "laravel-jetstream",
-    "version": "1.2.0",
+    "name": "laravel-jetstream2",
+    "version": "1.0.0",
     "description": "",
     "main": "dist/index.js",
     "jsnext:main": "src/index.js",
@@ -11,7 +11,7 @@
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/laravel/jetstream-js"
+        "url": "https://github.com/nakjemmy/jetstream-js"
     },
     "keywords": [
         "laravel",
@@ -20,12 +20,12 @@
         "form",
         "inertia"
     ],
-    "author": "Taylor Otwell",
+    "author": "Jeremiah Nsiah Akuoko",
     "license": "MIT",
     "bugs": {
-        "url": "https://github.com/laravel/jetstream-js/issues"
+        "url": "https://github.com/nakjemmy/jetstream-js/issues"
     },
-    "homepage": "https://github.com/laravel/jetstream-js",
+    "homepage": "https://github.com/nakjemmy/jetstream-js",
     "devDependencies": {
         "babel-cli": "^6.9.0",
         "babel-plugin-transform-async-to-generator": "^6.16.0",
