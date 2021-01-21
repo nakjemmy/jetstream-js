@@ -181,7 +181,7 @@ class InertiaForm {
             if (options.onFinish) {
                 return options.onFinish()
             }
-        },
+        }
 
 
         if (requestType === 'delete') {
